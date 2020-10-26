@@ -16,7 +16,7 @@ jobs:
       env:
         APP_ID: ${{ secrets.APP_ID}}
       run: |-
-        curl "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '.rates | to_entries[] | [.key, .value] | @csv' > "exchange_$(date +"%Y%m%d-%H")".csv
+        curl "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '.rates | to_entries[] | [.key, .value] | @csv' > "rates/exchange_$(date +"%Y%m%d-%H")".csv
     - name: Commit and push if it changed
       run: |-
         git config user.name "Automated"
