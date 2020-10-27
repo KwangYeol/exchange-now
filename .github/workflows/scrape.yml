@@ -21,7 +21,7 @@ jobs:
         cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' | tee $CSV_MONTHLY
     - name: Fetch currency code
       run: |-
-        curl -s "https://openexchangerates.org/api/currencies.json" | jq -r '. | to_entries[] | ["Code", "Fullname"], [.key, .value] | @csv' > currencies.csv
+        curl -s "https://openexchangerates.org/api/currencies.json" | jq -r '{"Code": "Fullname"}, . | to_entries[] | [.key, .value] | @csv' > currencies.csv
     - name: Commit and push if it changed
       run: |-
         git config user.name "Automated"
