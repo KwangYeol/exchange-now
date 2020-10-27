@@ -31,8 +31,18 @@ for i in `seq 1 $NUM_DAYS`;
 do
   DT=$(date -j -f "%Y-%m-%d" -v+${$((i-1))}d $BEGIN_DT +%Y-%m-%d)
   echo "get $DT"
-  curl -sk "https://openexchangerates.org/api/historical/${DT}.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' >> $CSV_MONTHLY
-  cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' | tee $CSV_MONTHLY
+  curl -s "https://openexchangerates.org/api/historical/${DT}.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' > curr.csv
+  sleep 1
+  cat $CSV_MONTHLY curr.csv | awk -F, '!a[$1$2]++' | tee mon.csv
+  mv mon.csv $CSV_MONTHLY
+  sleep 1
+  rm curr.csv
 done;
 # -->!
+```
+
+To validate csv file
+
+```
+R -e 'df=read.csv("rates/202001.csv", header=F)'
 ```

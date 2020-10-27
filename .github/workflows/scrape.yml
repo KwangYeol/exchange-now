@@ -17,8 +17,12 @@ jobs:
         APP_ID: ${{ secrets.APP_ID}}
       run: |-
         CSV_MONTHLY="rates/$(date +'%Y%m').csv"
-        curl -s "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' >> $CSV_MONTHLY
-        cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' | tee $CSV_MONTHLY
+        curl -s "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' > curr.csv
+        sleep 1
+        cat $CSV_MONTHLY curr.csv | awk -F, '!a[$1$2]++' | tee mon.csv
+        sleep 1
+        mv mon.csv $CSV_MONTHLY
+        rm curr.csv
     - name: Fetch currency code
       run: |-
         curl -s "https://openexchangerates.org/api/currencies.json" | jq -r '{"Code": "Fullname"}, . | to_entries[] | [.key, .value] | @csv' > currencies.csv
