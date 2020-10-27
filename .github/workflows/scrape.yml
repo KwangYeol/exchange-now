@@ -18,7 +18,7 @@ jobs:
       run: |-
         CSV_MONTHLY="rates/$(date +'%Y%m').csv"
         curl "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' >> $CSV_MONTHLY
-        cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' > $CSV_MONTHLY
+        cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' | tee $CSV_MONTHLY
     - name: Commit and push if it changed
       run: |-
         git config user.name "Automated"
