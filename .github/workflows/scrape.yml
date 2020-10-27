@@ -12,14 +12,16 @@ jobs:
     steps:
     - name: Check out this repo
       uses: actions/checkout@v2
-    - name: Fetch latest data
+    - name: Fetch latest currency rates
       env:
         APP_ID: ${{ secrets.APP_ID}}
       run: |-
         CSV_MONTHLY="rates/$(date +'%Y%m').csv"
         curl -s "https://openexchangerates.org/api/latest.json?app_id=$APP_ID" | jq -r '. as $R | $R.timestamp | strftime("%Y-%m-%d") as $ts | ($R.rates | to_entries[] | [$ts, .key, .value]) | @csv' >> $CSV_MONTHLY
         cat $CSV_MONTHLY | awk -F, '!a[$1$2]++' | tee $CSV_MONTHLY
-        curl -s "https://openexchangerates.org/api/currencies.json" | jq > currencies.json
+    - name: Fetch currency code
+      run: |-
+        curl -s "https://openexchangerates.org/api/currencies.json" | jq -r '. | to_entries[] | ["Code", "Fullname"], [.key, .value] | @csv' > currencies.csv
     - name: Commit and push if it changed
       run: |-
         git config user.name "Automated"

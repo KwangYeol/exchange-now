@@ -16,7 +16,7 @@ Tracking exchange data from https://openexchangerates.org using Github action.
 
 This code block runs only for Mac OS X. 
 
-```
+```bash
 # Set the target month
 APP_ID={{ YOUR APPLICATION ID }}
 MONTH='2020-01'
